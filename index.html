@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Películas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- HEADER/NAVBAR -->
+    <nav class="navbar navbar-black bg-black sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1"><i class="bi bi-film"></i> CineFlix</span>
+            <div class="d-flex gap-2">
+                <button id="btnAgregar" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPelicula" style="display: none;">
+                    <i class="bi bi-plus-circle"></i> Agregar Película
+                </button>
+                <button id="btnLogout" class="btn btn-danger" style="display: none;">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </button>
+                <button id="btnLogin" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SECCIÓN DE LOGIN Y REGISTRO -->
+    <section id="loginSection" class="login-container">
+        <div class="login-card">
+            <h2 class="text-center mb-4"><i class="bi bi-film"></i> CineFlix</h2>
+            
+            <!-- TABS PARA LOGIN/REGISTRO -->
+            <ul class="nav nav-tabs mb-4" id="authTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="registro-tab" data-bs-toggle="tab" data-bs-target="#registro" type="button" role="tab">
+                        <i class="bi bi-person-plus"></i> Registro
+                    </button>
+                </li>
+            </ul>
+
+            <!-- CONTENIDO DE TABS -->
+            <div class="tab-content">
+                <!-- TAB LOGIN -->
+                <div class="tab-pane fade show active" id="login" role="tabpanel">
+                    <form id="formLogin">
+                        <div class="mb-3">
+                            <label for="inputUser" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="inputUser" placeholder="Ingrese usuario" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Ingrese contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                        <small class="d-block text-muted mt-3">
+                            Usuarios de prueba: admin/admin123, usuario/1234, demo/demo
+                        </small>
+                    </form>
+                </div>
+
+                <!-- TAB REGISTRO -->
+                <div class="tab-pane fade" id="registro" role="tabpanel">
+                    <form id="formRegistro">
+                        <div class="mb-3">
+                            <label for="inputNombre" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="inputNombre" placeholder="Tu nombre completo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="inputEmail" placeholder="tu@email.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputUserReg" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="inputUserReg" placeholder="Nombre de usuario único" required>
+                            <small class="text-muted">Mínimo 4 caracteres</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputPasswordReg" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="inputPasswordReg" placeholder="Mínimo 6 caracteres" required>
+                            <small class="text-muted">Debe tener al menos 6 caracteres</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputConfirmPassword" class="form-label">Confirmar Contraseña</label>
+                            <input type="password" class="form-control" id="inputConfirmPassword" placeholder="Confirma tu contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Crear Cuenta</button>
+                        <small class="d-block text-muted mt-3 text-center">
+                           
+                        </small>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN PRINCIPAL (oculta hasta login) -->
+    <div id="mainContent" style="display: none;">
+        <!-- BUSCADOR Y FILTRO AVANZADO -->
+        <div class="container my-4">
+            <div class="filtro-card">
+                <h5 class="mb-3"><i class="bi bi-funnel"></i> Filtros de Búsqueda</h5>
+                
+                <div class="row g-3">
+                    <!-- BÚSQUEDA POR TEXTO -->
+                    <div class="col-md-4">
+                        <label class="form-label">Por Título, Director o Descripción</label>
+                        <div class="input-group">
+                            <input type="text" id="inputBuscar" class="form-control" placeholder="Escribe aquí...">
+                            <button class="btn btn-outline-secondary" type="button" onclick="limpiarBusqueda()">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- FILTRO POR GÉNERO -->
+                    <div class="col-md-4">
+                        <label class="form-label">Género</label>
+                        <select id="selectGenero" class="form-select">
+                            <option value="">Todos los géneros</option>
+                            <option value="Acción">Acción</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Comedia">Comedia</option>
+                            <option value="Ciencia Ficción">Ciencia Ficción</option>
+                            <option value="Terror">Terror</option>
+                            <option value="Aventura">Aventura</option>
+                            <option value="ALternativo">Alternativo</option>
+                            <option value="Viejo Oeste">Viejo Oeste</option>
+                        </select>
+                    </div>
+                    
+                    <!-- FILTRO POR AÑO -->
+                    <div class="col-md-4">
+                        <label class="form-label">Año</label>
+                        <select id="selectAno" class="form-select">
+                            <option value="">Todos los años</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                            <option value="Anterior">Anterior a 2015</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mt-2">
+                    <!-- FILTRO POR CALIFICACIÓN -->
+                    <div class="col-md-4">
+                        <label class="form-label">Calificación Mínima</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" id="rangoCalificacion" class="form-range" min="0" max="10" step="0.5" value="0">
+                            <span class="badge bg-secondary" id="calificacionBadge">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- ORDENAR POR -->
+                    <div class="col-md-4">
+                        <label class="form-label">Ordenar Por</label>
+                        <select id="selectOrden" class="form-select">
+                            <option value="reciente">Más Reciente</option>
+                            <option value="antiguo">Más Antiguo</option>
+                            <option value="titulo">Título (A-Z)</option>
+                            <option value="calificacion">Mayor Calificación</option>
+                        </select>
+                    </div>
+                    
+                    <!-- BOTONES DE ACCIÓN -->
+                    <div class="col-md-4">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary w-100" onclick="aplicarFiltros()">
+                                <i class="bi bi-search"></i> Filtrar
+                            </button>
+                            <button class="btn btn-secondary" onclick="resetearFiltros()">
+                                <i class="bi bi-arrow-clockwise"></i> Resetear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARRUSEL DE PELÍCULAS RECIENTES -->
+        <div class="container my-4">
+            <h4 class="mb-3">Películas Recientes</h4>
+            <div id="carouselRecientes" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner" id="carouselContent">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRecientes" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselRecientes" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- GRID DE PELÍCULAS -->
+        <div class="container my-4">
+            <h4 class="mb-3">Todas las Películas</h4>
+            <div id="gridPeliculas" class="row g-4">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div id="sinResultados" class="alert alert-info text-center" style="display: none;">
+                <i class="bi bi-search"></i> No se encontraron películas
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR/EDITAR PELÍCULA -->
+    <div class="modal fade" id="modalPelicula" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo">Agregar Película</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formPelicula">
+                        <div class="mb-3">
+                            <label for="inputTitulo" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="inputTitulo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputGenero" class="form-label">Género</label>
+                            <select class="form-select" id="inputGenero" required>
+                                <option value="">Seleccione género</option>
+                                <option value="Acción">Acción</option>
+                                <option value="Drama">Drama</option>
+                                <option value="Comedia">Comedia</option>
+                                <option value="Ciencia Ficción">Ciencia Ficción</option>
+                                <option value="Terror">Terror</option>
+                                <option value="Aventura">Aventura</option>
+                                 <option value="ALternativo">Alternativo</option>
+                            <option value="Viejo Oeste">Viejo Oeste</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputDirector" class="form-label">Director</label>
+                            <input type="text" class="form-control" id="inputDirector" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputAno" class="form-label">Año</label>
+                            <input type="number" class="form-control" id="inputAno" min="1900" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputCalificacion" class="form-label">Calificación (1-10)</label>
+                            <input type="number" class="form-control" id="inputCalificacion" min="1" max="10" step="0.1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputDescripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="inputDescripcion" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputImagen" class="form-label">URL de Imagen</label>
+                            <input type="url" class="form-control" id="inputImagen" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarPelicula">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA VER DETALLES -->
+    <div class="modal fade" id="modalDetalles" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detallesTitulo"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <img id="detallesImagen" src="" alt="" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-7">
+                            <p><strong>Género:</strong> <span id="detallesGenero"></span></p>
+                            <p><strong>Director:</strong> <span id="detallesDirector"></span></p>
+                            <p><strong>Año:</strong> <span id="detallesAno"></span></p>
+                            <p><strong>Calificación:</strong> <span id="detallesCalificacion"></span> ⭐</p>
+                            <p><strong>Descripción:</strong></p>
+                            <p id="detallesDescripcion"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="localstorage.js"></script>
+    <script src="peliculas.js"></script>
+</body>
+</html>
